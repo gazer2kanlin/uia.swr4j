@@ -18,31 +18,42 @@ public interface ChangeOverPoint extends Remote {
      *
      */
     public enum Mode {
+        /**
+         * Standby
+         */
         STANDBY,
+
+        /**
+         * Running
+         */
         RUNNING,
+
+        /**
+         * Switching
+         */
         SWITCHING
     }
 
     /**
-     * Make APP into RUNNING mode.
+     * Make APP go into RUNNING mode.
      * @throws RemoteException Call exception.
      */
     public void runIn() throws RemoteException;
 
     /**
-     * Make APP into RUNNING mode.
+     * Make APP go into RUNNING mode.
      * @throws RemoteException Call exception.
      */
     public void standBy() throws RemoteException;
 
     /**
-     * Raise after another APP is STANDBY.
+     * Raise when remote point is STANDBY.
      * @throws RemoteException Call exception.
      */
     public void anotherStandBy() throws RemoteException;
 
     /**
-     * Raise after another APP is RUNNING.
+     * Raise when remote point is RUNNING.
      * @throws RemoteException Call exception.
      */
     public void anotherRunIn() throws RemoteException;
@@ -57,14 +68,14 @@ public interface ChangeOverPoint extends Remote {
     /**
      * Get if remote alive or not.
      * @return Alive or not.
-     * @throws RemoteException
+     * @throws RemoteException Call exception.
      */
     public boolean isRemoteAlive() throws RemoteException;
 
     /**
      * Check if alive or not. Return true.
-     * @return
-     * @throws RemoteException
+     * @return Alive or not.
+     * @throws RemoteException Call exception.
      */
     public boolean alive() throws RemoteException;
 }

@@ -7,6 +7,11 @@ import java.rmi.server.UnicastRemoteObject;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+/**
+ *
+ * @author Kan
+ *
+ */
 public class ChangeOverPointServer extends UnicastRemoteObject implements ChangeOverPoint {
 
     private static final long serialVersionUID = -2520776277130805399L;
@@ -31,10 +36,27 @@ public class ChangeOverPointServer extends UnicastRemoteObject implements Change
 
     private ChangeOverPoint remotePoint;
 
+    /**
+     * Constructor.
+     * @param app Application.
+     * @param appName Application name.
+     * @param remoteAddr Remote address.
+     * @param master Master or not.
+     * @throws RemoteException RMI exception.
+     */
     public ChangeOverPointServer(App app, String appName, String remoteAddr, boolean master) throws RemoteException {
         this(app, appName, appName, remoteAddr, master);
     }
 
+    /**
+     * Constructor.
+     * @param app Application.
+     * @param localRMIName Local RMI name.
+     * @param remoteRMIName Remote RMI name.
+     * @param remoteAddr Remote address.
+     * @param master Master or not.
+     * @throws RemoteException RMI exception.
+     */
     public ChangeOverPointServer(App app, String localRMIName, String remoteRMIName, String remoteAddr, boolean master) throws RemoteException {
         super();
 
@@ -47,13 +69,21 @@ public class ChangeOverPointServer extends UnicastRemoteObject implements Change
         this.master = master;
     }
 
+    /**
+     * Get this server is master or not.
+     * @return Master or not.
+     */
     public boolean isMaster() {
         return this.master;
     }
 
+    /**
+     * Start this server.
+     * @return Result.
+     */
     public boolean start() {
         String localhost = "localhost";
-        String message = String.format("swr> rebind //%1$s/%2$-22s - %3$s",
+        String message = String.format("swr> rebind //%1$s:1099/%2$-22s - %3$s",
                 localhost,
                 this.localRMIName,
                 getClass().getName());
@@ -66,19 +96,14 @@ public class ChangeOverPointServer extends UnicastRemoteObject implements Change
             return false;
         }
 
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                checkRunning();
-
-            }
-
-        }).start();
+        new Thread(() -> checkRunning()).start();
 
         return true;
     }
 
+    /**
+     * Stop this server.
+     */
     public void stop() {
 
     }
@@ -86,23 +111,19 @@ public class ChangeOverPointServer extends UnicastRemoteObject implements Change
     @Override
     public void standBy() throws RemoteException {
         this.mode = Mode.SWITCHING;
-        if (this.app.monitorIn()) {
+        boolean ok = this.app.monitorIn();
+        if (ok) {
             this.mode = Mode.STANDBY;
             logger.info("swr> switch to STANDBY mode.");
-            new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-                    if (rebindRemote()) {
-                        try {
-                            ChangeOverPointServer.this.remotePoint.anotherStandBy();
-                        }
-                        catch (Exception ex) {
-
-                        }
+            new Thread(() -> {
+                if (rebindRemote()) {
+                    try {
+                        ChangeOverPointServer.this.remotePoint.anotherStandBy();
+                    }
+                    catch (Exception ex) {
+                        ChangeOverPointServer.this.remotePoint = null;
                     }
                 }
-
             }).start();
         }
         else {
@@ -114,23 +135,19 @@ public class ChangeOverPointServer extends UnicastRemoteObject implements Change
     @Override
     public void runIn() throws RemoteException {
         this.mode = Mode.SWITCHING;
-        if (this.app.runIn()) {
+        boolean ok = this.app.runIn();
+        if (ok) {
             this.mode = ChangeOverPoint.Mode.RUNNING;
             logger.info("swr> switch to RUNNING mode.");
-            new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-                    if (rebindRemote()) {
-                        try {
-                            ChangeOverPointServer.this.remotePoint.anotherRunIn();
-                        }
-                        catch (Exception ex) {
-
-                        }
+            new Thread(() -> {
+                if (rebindRemote()) {
+                    try {
+                        ChangeOverPointServer.this.remotePoint.anotherRunIn();
+                    }
+                    catch (Exception ex) {
+                        ChangeOverPointServer.this.remotePoint = null;
                     }
                 }
-
             }).start();
         }
         else {
@@ -182,8 +199,8 @@ public class ChangeOverPointServer extends UnicastRemoteObject implements Change
         }
         catch (Exception ex) {
             this.remotePoint = null;
-            return false;
         }
+        return false;
     }
 
     private void checkRunning() {
@@ -207,12 +224,19 @@ public class ChangeOverPointServer extends UnicastRemoteObject implements Change
                     continue;
                 }
 
-                if (this.remotePoint.getMode() == Mode.SWITCHING) {
-                    continue;
-                }
+                try {
+                    Mode remoteMode = this.remotePoint.getMode();
+                    if (Mode.SWITCHING == remoteMode) {
+                        continue;
+                    }
 
-                if (this.mode != this.remotePoint.getMode()) {
-                    logger.debug("swr> " + this.mode);
+                    if (this.mode != remoteMode) {
+                        logger.debug("swr> " + this.mode);
+                        continue;
+                    }
+                }
+                catch (Exception ex) {
+                    this.remotePoint = null;
                     continue;
                 }
 

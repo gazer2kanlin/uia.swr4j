@@ -5,7 +5,7 @@
  	<artifactId>uia.swr</artifactId>
 	<version>0.2.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>uia.comm</name>
+	<name>uia.swr</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -30,8 +30,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.5.1</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.8</source>
+					<target>1.8</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -39,7 +39,6 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.4</version>
 			</plugin>
-			<!-- 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
@@ -52,12 +51,11 @@
 					</execution>
 				</executions>
 			</plugin>
-			 -->
 		</plugins>
 	</build>
 	<scm>
 		<developerConnection>Kyle K. Lin</developerConnection>
-		<url>https://bitbucket.org/uia/uia.comm4j</url>
+		<url>https://github.com/gazer2kanlin/uia.swr4j</url>
 	</scm>
 	<distributionManagement>
 		<repository>
@@ -72,5 +70,5 @@
 			<uniqueVersion>false</uniqueVersion>
 		</snapshotRepository>
 	</distributionManagement>
-	<url>https://bitbucket.org/uia/uia.comm4j</url>
+	<url>https://github.com/gazer2kanlin/uia.swr4j</url>
 </project>
