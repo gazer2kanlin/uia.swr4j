@@ -36,6 +36,8 @@ public class ChangeOverPointServer extends UnicastRemoteObject implements Change
 
     private ChangeOverPoint remotePoint;
 
+    private int counter;
+
     /**
      * Constructor.
      * @param app Application.
